@@ -1,3 +1,3 @@
 .pio/build/esp32dev/FrameworkArduino/firmware_msc_fat.c.o: \
- C:/Users/Omri/.platformio/packages/framework-arduinoespressif32/cores/esp32/firmware_msc_fat.c \
- C:/Users/Omri/.platformio/packages/framework-arduinoespressif32/cores/esp32/firmware_msc_fat.h
+ /Users/omrisaporta/.platformio/packages/framework-arduinoespressif32/cores/esp32/firmware_msc_fat.c \
+ /Users/omrisaporta/.platformio/packages/framework-arduinoespressif32/cores/esp32/firmware_msc_fat.h

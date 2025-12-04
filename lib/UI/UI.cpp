@@ -44,18 +44,37 @@ void UI::setupPinsAndSensors() {
 }
 
 STATION_STATE UI::sampleStations() {
-    // Debouncing is handled on the sender ESPs.
-    // Here we just check which station reported an event via ESP-NOW.
-    for (int i = 0; i < NUM_STATIONS; i++) {
+    const unsigned long debounceDelay = 30; // Debounce delay in milliseconds
+
+    // 1) LOCAL: Station 0 (STATION_START) is still wired directly to this board
+    int station0State = digitalRead(stationPins[0]); // pin for STATION_START
+
+    if (station0State == LOW) {
+        // Debounce for local station 0
+        if ((millis() - stationDebounceTimes[0]) > debounceDelay) {
+            if (!stationStableStates[0]) { // new stable LOW
+                stationStableStates[0] = true;
+                Serial.println("Station 0 (START) is LOW (local)");
+                return STATION_START;
+            }
+        }
+    } else {
+        // Reset debounce for station 0 when it's HIGH
+        stationStableStates[0] = false;
+        stationDebounceTimes[0] = millis();
+    }
+
+    // 2) REMOTE: Stations 1..7 come via ESP-NOW (stationTriggered[])
+    for (int i = 1; i < NUM_STATIONS; i++) {
         if (stationTriggered[i]) {
             stationTriggered[i] = false; // consume the event
 
             Serial.println("Station " + String(i) + " is LOW (remote)");
-            return static_cast<STATION_STATE>(i); // STATION_START=0, STATION_LAST=7
+            return static_cast<STATION_STATE>(i); // STATION_1..STATION_LAST
         }
     }
 
-    return STATION_NONE; // No station event pending
+    return STATION_NONE; // No station active
 }
 
 BUTTON_SENSORS_INPUTS UI::inputReceived() {
